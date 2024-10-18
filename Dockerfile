@@ -17,14 +17,24 @@ RUN set -ex \
     shairport-sync@testing \
     snapcast \
     snapweb@testing \
+#    avahi \
+  && apk add -U avahi \
+    avahi-tools \
+#  && apk add dbus \
+#  && dbus-uuidgen > /var/lib/dbus/machine-id \
+#  && mkdir -p /var/run/dbus \
   && echo "**** cleanup ****" \
   && rm -rf \
-    /tmp/*
+    /tmp/* \
+    /etc/ssl \
+    /var/cache/apk/* \
+    /lib/apk/db/*
 
 # apk add alsa-utils alsa-lib alsaconf alsa-ucm-conf
 # environment settings
 ENV \
-START_SNAPCLIENT=false \
+START_SNAPCLIENT=true \
+START_SNAPSERVER=false \
 SNAPCLIENT_OPTS="" \
 SNAPSERVER_OPTS=""
 

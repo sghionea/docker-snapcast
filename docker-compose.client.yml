@@ -1,0 +1,38 @@
+version: "3"
+services:
+  snapcast:
+    #image: docker.io/sweisgerber/snapcast:latest
+    image: snapcast #our own custom-built image
+    container_name: snapcast
+    hostname: snapcast
+    environment:
+      - PUID=1000
+      - PGID=29 # set to audio group ID
+      - TZ=US/Pacific
+      - START_SNAPCLIENT=true # set to `true` for snapclient to start
+      - START_SNAPSERVER=false
+      # --host: name or ip of compose service or dockerhost
+      # --soundcard: <ID> from `snapclient -l` from inside the container
+      # - SNAPCLIENT_OPTS=--host snapcast --soundcard <ID>
+      #   => Don't use quotes for SNAPCLIENT_OPTS="" !
+      - SNAPCLIENT_OPTS=--host rpigarage.lan --soundcard Audio --hostID sndrpi3a
+      - HOST_AUDIO_GROUP=29 # set to GID of host audio group
+    restart: "unless-stopped"
+    ports:
+      - 1704:1704 # port for the actual audio streaming
+      - 1705:1705 # port for TCP Json RPC
+      - 1780:1780 # port for the SnapWeb Webinterface
+    devices:
+      - /dev/snd:/dev/snd # optional, only if you want to use snapclient
+    volumes:
+      - /home/sghionea/volumes/snapcast/config/:/config/
+      - /home/sghionea/volumes/snapcast/data/:/data/
+      # /audio should get used to place FIFOs for audio playback from mpd/mopidy/host/etc
+      #- /<path>/<to>/audio-fifos/:/audio/
+
+      # dbus sharing with host machine
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon:/var/run/avahi-daemon
+
+      # share hostname
+      # - /etc/hostname:/etc/hostname
